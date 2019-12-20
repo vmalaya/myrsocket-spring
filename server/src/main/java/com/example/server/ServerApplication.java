@@ -19,37 +19,3 @@ public class ServerApplication {
 
 }
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class GreetingsRequest {
-    private String name;
-}
-
-@Controller
-class GreetingsRSocketController {
-
-    @MessageMapping("greet")
-    GreetingsResponse greet(GreetingsRequest request) {
-        return new GreetingsResponse(request.getName());
-    }
-
-}
-
-@Data
-class GreetingsResponse {
-    private String greeting;
-
-    GreetingsResponse() {
-    }
-
-    GreetingsResponse(String name) {
-        this.withGreeting("Hello, " + name + " @ " + Instant.now());
-    }
-
-    GreetingsResponse withGreeting(String message) {
-        greeting = message;
-        return this;
-    }
-}
-

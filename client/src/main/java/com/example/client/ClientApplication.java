@@ -7,20 +7,24 @@ import io.rsocket.transport.netty.client.TcpClientTransport;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.reactivestreams.Publisher;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.messaging.rsocket.RSocketStrategies;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 
-import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.time.Instant;
+
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @SpringBootApplication
 public class ClientApplication {
@@ -53,43 +57,3 @@ public class ClientApplication {
     }
 }
 
-@RestController
-class GreetingsRestController {
-    private final RSocketRequester requester;
-
-    GreetingsRestController(RSocketRequester requester) {
-        this.requester = requester;
-    }
-
-    @GetMapping("/greet/{name}")
-    Publisher<GreetingsResponse> greet(@PathVariable String name) {
-        return requester.route("greet")
-                .data(new GreetingsRequest(name))
-                .retrieveMono(GreetingsResponse.class);
-    }
-
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class GreetingsRequest {
-    private String name;
-}
-
-@Data
-class GreetingsResponse {
-    private String greeting;
-
-    GreetingsResponse() {
-    }
-
-    GreetingsResponse(String name) {
-        this.withGreeting("Hello, " + name + " @ " + Instant.now());
-    }
-
-    GreetingsResponse withGreeting(String message) {
-        greeting = message;
-        return this;
-    }
-}
